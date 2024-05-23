@@ -1,0 +1,15 @@
+name: Lint and test react app
+on:
+    push
+jobs:
+    lint-and-test:
+        runs-on: ubuntu-latest
+        steps:
+          - name: get repo code
+            uses: actions/checkout@v3
+          - name: install dependencies
+            run: npm ci
+          - name: lint
+            run: npm run lint
+          - name: test
+            run: npm run test

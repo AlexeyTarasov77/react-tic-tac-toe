@@ -2,13 +2,25 @@ import Image from "next/image";
 import avatarSrc from "./images/avatar-1.png";
 import clsx from "clsx";
 import { GameSymbol } from "./game-symbol";
+import { useNow } from "../../lib/timers";
 
-export function PlayerInfo({ playerInfo, isRight, isTimerRunning, avatar = avatarSrc, seconds }) {
+export function PlayerInfo({
+  playerInfo,
+  isRight,
+  timerStartAt,
+  avatar = avatarSrc,
+  timer,
+}) {
+
+  const now = useNow(1, !!timerStartAt)
+  const mils = Math.max(now ? timer - (now - timerStartAt) : timer, 0)
+
+  const seconds = Math.ceil(mils / 1000);
   const minutesString = String(Math.floor(seconds / 60)).padStart(2, "0");
   const secondsString = String(seconds % 60).padStart(2, "0");
 
   const timeStatus = () => {
-    if (!isTimerRunning) {
+    if (!timerStartAt) {
       return "disabled";
     } else if (seconds <= 10) {
       return "danger";
@@ -17,7 +29,7 @@ export function PlayerInfo({ playerInfo, isRight, isTimerRunning, avatar = avata
     }
   };
 
-  const timeStatusVariants = { 
+  const timeStatusVariants = {
     danger: "text-red-500",
     normal: "text-slate-900",
     disabled: "text-slate-200",
@@ -27,13 +39,13 @@ export function PlayerInfo({ playerInfo, isRight, isTimerRunning, avatar = avata
     <div className="flex gap-3 items-center">
       <div className={clsx("relative", isRight && "order-3")}>
         <div
-          className={
-            "flex items-center gap-2 text-start text-teal-600 w-44"
-        }
+          className={"flex items-center gap-2 text-start text-teal-600 w-44"}
         >
           <Image src={avatar} width={48} height={48} alt="avatar" unoptimized />
           <div className="overflow-hidden">
-            <div className="text-lg leading-tight truncate">{playerInfo.name}</div>
+            <div className="text-lg leading-tight truncate">
+              {playerInfo.name}
+            </div>
             <div className="text-slate-400 text-xs leading-tight">
               Рейтинг: {playerInfo.rating}
             </div>

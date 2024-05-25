@@ -1,15 +1,40 @@
 name: Lint and test react app
 on:
-    push
+    push:
+        branches: [main]
 jobs:
-    lint-and-test:
+    test:
         runs-on: ubuntu-latest
         steps:
           - name: get repo code
             uses: actions/checkout@v3
+          - name: cache deps
+            uses: actions/cache@v3
+            with:
+              path: ~/.npm
+              key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          - name: install dependencies
+            run: npm ci
+          - name: test
+            run: npm run test
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+          - name: get repo code
+            uses: actions/checkout@v3 
+          - name: cache deps
+            uses: actions/cache@v3
+            with:
+              path: ~/.npm
+              key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           - name: install dependencies
             run: npm ci
           - name: lint
             run: npm run lint
-          - name: test
-            run: npm run test
+    deploy:
+        runs-on: ubuntu-latest
+        needs: [test, lint]
+        steps:
+          - name: deploy application
+            run: echo "Deploying application"
+            
